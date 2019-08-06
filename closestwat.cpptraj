@@ -1,0 +1,7 @@
+#correr primero watershell para determinar el número de aguas (cpptraj.cuda)
+parm ../alfa-beta_WAT_WAT_1.prmtop
+trajin md1-1000_alfa-beta_WAT_WAT_1.nc
+reference ../alfa-beta_WAT_WAT_1.prmcrd
+closest 4900 :2-488,491-956 first closestout closestmols.dat noimage outprefix closest 
+trajout closest.alfa-beta_WAT_WAT_1.nc netcdf
+go

@@ -1,0 +1,5 @@
+#remove water
+parm ../alfa-beta_WAT_WAT_1.prmtop
+parmstrip :WAT,Na+,Cl-
+parmwrite out alfa-beta_WAT_WAT_1_dry.prmtop
+go

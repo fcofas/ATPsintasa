@@ -1,0 +1,27 @@
+parm ../1cow_WAT_WAT_1.prmtop
+trajin md?.nc 1 last 10
+trajin md??.nc 1 last 10
+trajin md???.nc 1 last 10
+trajin md1000.nc 1 last 10 
+center :1-2998 mass origin 
+image origin center familiar 
+reference ../1cow_WAT_WAT_1.prmcrd
+rms reference ":151-338,640-827,1129-1316,1563-1789,2032-2258,2494-2720@CA,C,N,O" out rmsd_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":1-487@CA,C,N,O" out rmsd_aE_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":488-974@CA,C,N,O" out rmsd_aTP_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":975-1466@CA,C,N,O" out rmsd_aDP_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":1467-1936@CA,C,N,O" out rmsd_bE_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":1937-2406@CA,C,N,O" out rmsd_bDP_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":2407-2876@CA,C,N,O" out rmsd_bTP_1cow_WAT_WAT_1.dat time 0.2 mass
+rms reference nofit ":2877-2998@CA,C,N,O" out rmsd_g_1cow_WAT_WAT_1.dat time 0.2 mass
+atomicfluct out rmsf_aE_1cow_WAT_WAT_1.dat :1-487@CA byres
+atomicfluct out rmsf_aTP_1cow_WAT_WAT_1.dat :488-974@CA byres
+atomicfluct out rmsf_aDP_1cow_WAT_WAT_1.dat :975-1466@CA byres
+atomicfluct out rmsf_bE_1cow_WAT_WAT_1.dat :1467-1936@CA byres
+atomicfluct out rmsf_bDP_1cow_WAT_WAT_1.dat :1937-2406@CA byres
+atomicfluct out rmsf_bTP_1cow_WAT_WAT_1.dat :2407-2876@CA byres
+atomicfluct out rmsf_g_1cow_WAT_WAT_1.dat :2877-2998@CA byres
+average average_1cow_WAT_WAT_1.pdb pdb
+average average_1cow_WAT_WAT_1.crd crd
+trajout md1-1000_1cow_WAT_WAT_1.nc netcdf
+go

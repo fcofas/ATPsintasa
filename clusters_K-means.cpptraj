@@ -1,0 +1,3 @@
+parm ../closest.alfa-beta_WAT_WAT_1.prmtop
+trajin ../closest.alfa-beta_WAT_WAT_1.nc 1 last 100
+cluster kmeans clusters 15 randompoint averagelinkage random dme nofit ":2-488,491-956@CA,C,N,O" out clustervst_alfa-beta_wat_.dat summary avg.summary_name_.dat repfmt pdb repout cluster_alfa-beta_wat_ info clusters_alfa-beta_wat_.info

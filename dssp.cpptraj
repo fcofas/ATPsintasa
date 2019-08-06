@@ -1,0 +1,4 @@
+parm ../alfa-beta_WAT_WAT_1.prmtop
+trajin md1-1000_alfa-beta_WAT_WAT_1.nc 1 last 500
+secstruct :1-486 out dssp_alfa-beta_WAT_WAT_1_alfa.gnu sumout dssp_alfa-beta_WAT_WAT_1_alfa.agr 
+secstruct :487-933 out dssp_alfa-beta_WAT_WAT_1_beta.gnu sumout dssp_alfa-beta_WAT_WAT_1_beta.agr 

@@ -1,0 +1,10 @@
+#save every 5 ns
+parm ../alfa-beta_WAT_WAT_1.prmtop
+trajin md1-1000_alfa-beta_WAT_WAT_1.nc 1 last 500
+strip :WAT,Na+,Cl-,atp,MG
+center :2-488,491-956 mass origin 
+image origin center 
+autoimage 
+reference ../alfa-beta_WAT_WAT_1.prmcrd
+trajout md1-1000_alfa-beta_WAT_WAT_1.pdb pdb
+go
