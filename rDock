@@ -1,0 +1,154 @@
+#Preparación de la diana
+1. Abrir pdb de la diana en Chimera
+2. Eliminar heteroátomos no necesarios (ATP, MG, ADP, HOH, etc.)
+3. Tools... Structure editing... Dock prep
+4. Salvar la diana como mol2
+
+#Si se conoce un ligando unido a la cavidad de interés
+1. Abrir el pdb con el ligando
+2. Alinear el pdb con el ligando con la diana (mol2)
+3. Seleccionar el ligando
+3. File... Save PDB... 
+3.a Elegir salvar el modelo con el ligando
+3.b Seleccionar Salvar sólo átomos seleccionados
+3.c Salvar relativo al modelo: diana, como reference.pdb
+4. Abrir reference.pdb para corroborar que se encuentre en las coordenadas correctas.
+4.1 Protonar el ligando y guardarlo nuevamente.
+5. Convertir reference.pdb a formato sdf:
+babel -ipdb reference.pdb -osdf reference.sdf
+
+#Generación del grid
+
+rbcavity -was -d -r good.prm
+
+
+
+#good.prm
+
+RBT_PARAMETER_FILE_V1.00
+TITLE atp_synthase
+
+RECEPTOR_FILE atp.mol2
+RECEPTOR_FLEX 3.0
+
+##################################################################
+### CAVITY DEFINITION: REFERENCE LIGAND METHOD
+##################################################################
+SECTION MAPPER
+    SITE_MAPPER RbtLigandSiteMapper
+    REF_MOL xtal-lig.sd
+    RADIUS 6.0
+    SMALL_SPHERE 1.0
+    MIN_VOLUME 100
+    MAX_CAVITIES 1
+    VOL_INCR 0.0
+   GRIDSTEP 0.5
+END_SECTION
+
+################################################################
+# CAVITY DEFINITION: TWO SPHERES METHOD
+################################################################
+#SECTION MAPPER
+#    SITE_MAPPER RbtSphereSiteMapper
+##HETATM 2815  O   HOH   756      37.266 -20.992  -4.910  0.90 24.86      1CSE2940
+#    CENTER (-9.393,19.324,6.368)
+#    RADIUS 15.0
+#    SMALL_SPHERE 1.5
+#    LARGE_SPHERE 6.0
+#    MAX_CAVITIES 1
+#END_SECTION
+
+#################################
+#CAVITY RESTRAINT PENALTY
+#################################
+SECTION CAVITY
+    SCORING_FUNCTION RbtCavityGridSF
+    WEIGHT 1.0
+END_SECTION
+
+#################################
+## PHARMACOPHORIC RESTRAINTS
+#################################
+#SECTION PHARMA
+#    SCORING_FUNCTION RbtPharmaSF
+#    WEIGHT 1.0
+#    CONSTRAINTS_FILE pharma.restr
+#   OPTIONAL_FILE optional_pharma.restr
+#   NOPT 3
+#   WRITE_ERRORS TRUE
+#END_SECTION
+
+#se puede crear otro archivo llamado optional_pharma.restr
+#NOPT 3 significa que sólo tres de las restricciones opcionales deben ser cumplidas
+
+
+#Revisar en Pymol que las coordenadas sean las correctas:
+
+pymol diana.mol2 reference.sd good_cav1.grd
+
+#En la linea de comando de pymol, escribir: 
+
+isomesh cavity, good_cav1, 0.99
+
+Verificar que el grid esté en la cavidad de interes y continuar si es correcto.
+
+
+#Quimioteca
+Descarga la quimioteca de interes y si se planea correr en paralelo, partirla con el siguiente comando:
+
+./split.sh quimioteca.sdf 10 split
+
+
+#split.sh
+
+#!/bin/bash
+#Usage: splitMols.sh <input> #Nfiles <outputRoot>
+fname=$1
+nfiles=$2
+output=$3
+molnum=$(grep -c '$$$$' $fname)
+echo "$molnum molecules found"
+echo "Dividing '$fname' into $nfiles files"
+rawstep=`echo $molnum/$nfiles | bc -l`
+let step=$molnum/$nfiles
+if [ ! `echo $rawstep%1 | bc` == 0 ]; then
+        let step=$step+1;
+fi;
+sdsplit -$step -o$output $1
+
+
+#Correr rbdock
+
+
+rbdock -i split1.sd -o split1_out -r good.prm -p dock.prm -n 100 > atp_1_out.log&
+rbdock -i split2.sd -o split2_out -r good.prm -p dock.prm -n 100 > atp_2_out.log&
+rbdock -i split3.sd -o split3_out -r good.prm -p dock.prm -n 100 > atp_3_out.log&
+rbdock -i split4.sd -o split4_out -r good.prm -p dock.prm -n 100 > atp_4_out.log&
+rbdock -i split5.sd -o split5_out -r good.prm -p dock.prm -n 100 > atp_5_out.log&
+rbdock -i split6.sd -o split6_out -r good.prm -p dock.prm -n 100 > atp_6_out.log&
+rbdock -i split7.sd -o split7_out -r good.prm -p dock.prm -n 100 > atp_7_out.log&
+rbdock -i split8.sd -o split8_out -r good.prm -p dock.prm -n 100 > atp_8_out.log&
+rbdock -i split9.sd -o split9_out -r good.prm -p dock.prm -n 100 > atp_9_out.log&
+rbdock -i split10.sd -o split10_out -r good.prm -p dock.prm -n 100 > atp_10_out.log&
+
+
+#si se hizo en paralelo, juntar todos los archivos
+
+cat split*_out.sd > global_out.sd
+
+#reporte
+
+sdreport -t global_out.sd > sdreport_results.txt
+
+#Ordenar resultados por score
+
+sdsort -n -s -fSCORE global_out.sd > global_1poseperlig.sd
+
+#esto da sólo los códigos zinc
+
+grep -A 1 "^>  <zinc_id>" global_1poseperlig.sd > global_sorted_zinc.txt
+
+#eliminar duplicados
+
+cat global_sorted_zinc.txt | awk '!a[$0]++' > global_sorted_zinc_ok.txt
+
